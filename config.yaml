@@ -1,0 +1,20 @@
+name: rPort
+version: 1.0.1
+slug: rport
+description: RPort client 0.9.12 for Home Assistant
+arch:
+- aarch64
+- amd64
+startup: services
+boot: auto
+host_network: true
+options:
+  Username: your username
+  Password: your password
+  Client Name: your client name
+  UUID: insert unique ID or leave blank to auto generate
+schema:
+  Username: str
+  Password: password
+  Client Name: str
+  UUID: str
