@@ -71,4 +71,29 @@ echo "Generated /etc/rport/rport.conf:"
 cat "$CONF_FILE" | sed 's/^auth = .*/auth = [REDACTED]/'
 
 chmod +x "$BIN"
-exec "$BIN" -c "$CONF_FILE"
+
+RPORT_PID=""
+stop_rport() {
+    echo "[INFO] Stop requested."
+    if [ -n "$RPORT_PID" ]; then
+        kill "$RPORT_PID" 2>/dev/null || true
+        wait "$RPORT_PID" 2>/dev/null || true
+    fi
+    exit 0
+}
+
+trap stop_rport INT TERM
+
+while true; do
+    "$BIN" -c "$CONF_FILE" &
+    RPORT_PID="$!"
+
+    set +e
+    wait "$RPORT_PID"
+    EXIT_CODE="$?"
+    set -e
+
+    RPORT_PID=""
+    echo "[ERROR] RPort exited with code ${EXIT_CODE}. Restarting in 10 seconds..."
+    sleep 10
+done
